@@ -2,6 +2,7 @@ package mka.item_helper_mobile;
 
 import android.content.ContentValues;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -67,6 +68,10 @@ public class MainActivity extends AppCompatActivity {
                         .setNegativeButton("Cancel", null)
                         .create();
                 alertDialog.show();
+                return true;
+            case R.id.action_open_scanner:
+                Intent intent = new Intent(this, BarcodeScanner.class);
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

@@ -6,7 +6,7 @@
 
     <item
         android:id="@+id/action_open_scanner"
-        android:icon="@android:drawable/btn_default_small"
+        android:icon="@android:drawable/ic_menu_camera"
         android:title="@string/open_scanner"
         app:showAsAction="ifRoom" />
 

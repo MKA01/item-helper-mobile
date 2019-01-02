@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">item-helper-mobile</string>
+    <string name="app_name">Shopping list</string>
     <string name="title_activity_login">Sign in</string>
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
@@ -17,4 +17,5 @@
     <string name="bought">Bought</string>
     <string name="add_product">Add product</string>
     <string name="open_scanner">Open scanner</string>
+    <string name="scan">Scan</string>
 </resources>
