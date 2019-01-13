@@ -6,7 +6,6 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -19,12 +18,23 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import mka.item_helper_mobile.Product;
+import mka.item_helper_mobile.database.Product;
 
-public class ProductsXmlParser {
+/**
+ * Klasa parsująca plik xml produktu.
+ */
+public class XmlParser {
 
     private static final String namespace = null;
 
+    /**
+     * Metoda służy do zaktualizowania pliku xml z zapisanymi kodami kreskowymi
+     *
+     * @param name        - nazwa przedmiotu
+     * @param code        - kod przedmiotu
+     * @param inputStream - plik
+     * @throws Exception -
+     */
     public void updateProducts(String name, String code, InputStream inputStream) throws Exception {
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
@@ -32,7 +42,7 @@ public class ProductsXmlParser {
         Element root = document.getDocumentElement();
 
         List<Product> products = new ArrayList<>();
-        products.add(new Product(name, code));
+        products.add(new Product(name, code, false));
 
         for (Product product : products) {
             Element newProduct = document.createElement("product");
@@ -56,6 +66,14 @@ public class ProductsXmlParser {
         transformer.transform(source, result);
     }
 
+    /**
+     * Metoda służy do sprawsowania pliku xml z produktami i ich kodem
+     *
+     * @param inputStream - plik
+     * @return - sparsowany plik xml
+     * @throws XmlPullParserException -
+     * @throws IOException            -
+     */
     public List<Product> parse(InputStream inputStream) throws XmlPullParserException, IOException {
         XmlPullParserFactory xmlPullParserFactory = XmlPullParserFactory.newInstance();
         XmlPullParser xmlPullParser = xmlPullParserFactory.newPullParser();
@@ -68,7 +86,14 @@ public class ProductsXmlParser {
         return readProducts(xmlPullParser);
     }
 
-
+    /**
+     * Metoda służy do zczytania produktów z pliku xml
+     *
+     * @param xmlPullParser - parser
+     * @return - produkty
+     * @throws IOException            -
+     * @throws XmlPullParserException -
+     */
     private List<Product> readProducts(XmlPullParser xmlPullParser) throws IOException, XmlPullParserException {
         List<Product> products = new ArrayList<>();
 
@@ -90,6 +115,14 @@ public class ProductsXmlParser {
         return products;
     }
 
+    /**
+     * Metoda śłuży do zczytania produktu z pliku xml
+     *
+     * @param xmlPullParser - parser
+     * @return - produkt
+     * @throws IOException            -
+     * @throws XmlPullParserException -
+     */
     private Product readProduct(XmlPullParser xmlPullParser) throws IOException, XmlPullParserException {
         xmlPullParser.require(XmlPullParser.START_TAG, namespace, "product");
 
@@ -116,9 +149,17 @@ public class ProductsXmlParser {
             }
         }
 
-        return new Product(name, code);
+        return new Product(name, code, false);
     }
 
+    /**
+     * Metoda służy do zczytania kodu kreskowego produktu
+     *
+     * @param xmlPullParser - parser
+     * @return - kod kreskowy produktu
+     * @throws IOException            -
+     * @throws XmlPullParserException -
+     */
     private String readCode(XmlPullParser xmlPullParser) throws IOException, XmlPullParserException {
         xmlPullParser.require(XmlPullParser.START_TAG, namespace, "code");
         String code = readText(xmlPullParser);
@@ -128,6 +169,14 @@ public class ProductsXmlParser {
 
     }
 
+    /**
+     * Metoda służy do zczytania nazwy produktu
+     *
+     * @param xmlPullParser - parser
+     * @return - nazwa produktu
+     * @throws IOException            -
+     * @throws XmlPullParserException -
+     */
     private String readName(XmlPullParser xmlPullParser) throws IOException, XmlPullParserException {
         xmlPullParser.require(XmlPullParser.START_TAG, namespace, "name");
         String name = readText(xmlPullParser);
@@ -136,6 +185,14 @@ public class ProductsXmlParser {
         return name;
     }
 
+    /**
+     * Metoda służy do zczytania tekstu z pliku xml
+     *
+     * @param xmlPullParser - parser
+     * @return - tekst
+     * @throws IOException            -
+     * @throws XmlPullParserException -
+     */
     private String readText(XmlPullParser xmlPullParser) throws IOException, XmlPullParserException {
         String result = "";
 
@@ -147,6 +204,13 @@ public class ProductsXmlParser {
         return result;
     }
 
+    /**
+     * Metoda służy do pominięcia nie interesujących nas tag'ów
+     *
+     * @param xmlPullParser - parser
+     * @throws IOException            -
+     * @throws XmlPullParserException -
+     */
     private void skip(XmlPullParser xmlPullParser) throws IOException, XmlPullParserException {
         if (xmlPullParser.getEventType() != XmlPullParser.START_TAG) {
             throw new IllegalStateException();

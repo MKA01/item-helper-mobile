@@ -2,14 +2,14 @@
 <products>
     <product>
         <name type="text">Krem do rąk ochronny z ekstraktem z bawełny ZIAJA</name>
-        <code type="text">590188700460</code>
+        <checked type="text">590188700460</checked>
     </product>
     <product>
         <name type="text">Ciastka śmietankowo truskawkowe</name>
-        <code type="text">5907471406827</code>
+        <checked type="text">5907471406827</checked>
     </product>
     <product>
         <name type="text">Podkładka pod mysz A4Tech</name>
-        <code type="text">4711421735193</code>
+        <checked type="text">4711421735193</checked>
     </product>
 </products>

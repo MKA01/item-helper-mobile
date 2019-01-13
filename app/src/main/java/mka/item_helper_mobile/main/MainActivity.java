@@ -1,19 +1,17 @@
-package mka.item_helper_mobile;
+package mka.item_helper_mobile.main;
 
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.XmlResourceParser;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -22,33 +20,32 @@ import android.widget.Toast;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import mka.item_helper_mobile.database.ProductContract;
+import mka.item_helper_mobile.R;
+import mka.item_helper_mobile.database.Product;
 import mka.item_helper_mobile.database.ProductDatabaseHelper;
-import mka.item_helper_mobile.utils.ProductsXmlParser;
+import mka.item_helper_mobile.database.ProductDatabaseStructure;
+import mka.item_helper_mobile.utils.ProductAdapter;
+import mka.item_helper_mobile.utils.XmlParser;
 
+/**
+ * Klasa bazowa do uruchamiania aplikacji
+ */
 public class MainActivity extends AppCompatActivity {
 
     private ProductDatabaseHelper productDatabaseHelper;
     private ListView productListView;
-    private ArrayAdapter<String> adapter;
+    private ProductAdapter adapter;
 
+    /**
+     * Metoda bazowa
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,34 +57,41 @@ public class MainActivity extends AppCompatActivity {
         updateUI();
     }
 
+    /**
+     * Nadpisana metoda pochodządza z klasy app.Activity
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.app_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
+    /**
+     * Nadpisana metoda pochodządza z klasy app.Activity
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add_product:
                 final EditText productEditText = new EditText(this);
                 AlertDialog alertDialog = new AlertDialog.Builder(this)
-                        .setTitle("Add a new product to shopping list")
-                        .setMessage("What do you want to buy?")
+                        .setTitle(R.string.add_product)
+                        .setMessage(R.string.what_to_buy)
                         .setView(productEditText)
-                        .setPositiveButton("Add product", new DialogInterface.OnClickListener() {
+                        .setPositiveButton(R.string.add, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 String productName = String.valueOf(productEditText.getText());
                                 SQLiteDatabase sqLiteDatabase = productDatabaseHelper.getWritableDatabase();
                                 ContentValues contentValues = new ContentValues();
-                                contentValues.put(ProductContract.ProductEntry.COL_PRODUCT_NAME, productName);
-                                sqLiteDatabase.insertWithOnConflict(ProductContract.ProductEntry.TABLE, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+                                contentValues.put(ProductDatabaseStructure.ProductEntry.PRODUCT_NAME, productName);
+                                contentValues.put(ProductDatabaseStructure.ProductEntry.PRODUCT_CHECKED, false);
+                                sqLiteDatabase.insertWithOnConflict(ProductDatabaseStructure.ProductEntry.TABLE, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
                                 sqLiteDatabase.close();
                                 updateUI();
                             }
                         })
-                        .setNegativeButton("Cancel", null)
+                        .setNegativeButton(R.string.cancel, null)
                         .create();
                 alertDialog.show();
                 return true;
@@ -100,20 +104,23 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Metoda nasłuchuje na zakończenie skanowania i dodaje zeskanowany produkt jeżeli isnieje w bazie
+     * Nadpisuje metodę z klasu app.Activity
+     */
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         IntentResult scanningResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
 
         if (scanningResult != null) {
             String productName = null;
             final String scannedProductCode = scanningResult.getContents();
-            final ProductsXmlParser productsXmlParser = new ProductsXmlParser();
+            final XmlParser xmlParser = new XmlParser();
             List<Product> products = new ArrayList<>();
 
-            final InputStream inputStream = this.getResources().openRawResource(R.raw.products);
-
+            final InputStream productsXml = this.getResources().openRawResource(R.raw.products);
 
             try {
-                products = productsXmlParser.parse(inputStream);
+                products = xmlParser.parse(productsXml);
             } catch (IOException | XmlPullParserException e) {
                 e.printStackTrace();
             }
@@ -124,19 +131,21 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
+            try {
+                productsXml.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
             if (productName != null) {
                 SQLiteDatabase sqLiteDatabase = productDatabaseHelper.getWritableDatabase();
                 ContentValues contentValues = new ContentValues();
-                contentValues.put(ProductContract.ProductEntry.COL_PRODUCT_NAME, productName);
-                sqLiteDatabase.insertWithOnConflict(ProductContract.ProductEntry.TABLE, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+                contentValues.put(ProductDatabaseStructure.ProductEntry.PRODUCT_NAME, productName);
+                sqLiteDatabase.insertWithOnConflict(ProductDatabaseStructure.ProductEntry.TABLE, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
                 sqLiteDatabase.close();
-                try {
-                    productsXmlParser.updateProducts("jajaja", "123321", inputStream);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
                 updateUI();
             } else {
+                final InputStream productsXml2 = this.getResources().openRawResource(R.raw.products);
                 final EditText productEditText = new EditText(this);
                 AlertDialog alertDialog = new AlertDialog.Builder(this)
                         .setTitle("Add a new product to and barcode to database")
@@ -148,16 +157,16 @@ public class MainActivity extends AppCompatActivity {
                                 String productName = String.valueOf(productEditText.getText());
                                 SQLiteDatabase sqLiteDatabase = productDatabaseHelper.getWritableDatabase();
                                 ContentValues contentValues = new ContentValues();
-                                contentValues.put(ProductContract.ProductEntry.COL_PRODUCT_NAME, productName);
-                                sqLiteDatabase.insertWithOnConflict(ProductContract.ProductEntry.TABLE, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
+                                contentValues.put(ProductDatabaseStructure.ProductEntry.PRODUCT_NAME, productName);
+                                contentValues.put(ProductDatabaseStructure.ProductEntry.PRODUCT_CHECKED, false);
+                                sqLiteDatabase.insertWithOnConflict(ProductDatabaseStructure.ProductEntry.TABLE, null, contentValues, SQLiteDatabase.CONFLICT_REPLACE);
                                 sqLiteDatabase.close();
-                                Log.e("Dupa2", inputStream.toString());
-//                                try {
-//                                    productsXmlParser.updateProducts(productName, scannedProductCode, inputStream);
-//                                } catch (Exception e) {
-//                                    e.printStackTrace();
-//                                }
-
+                                try {
+                                    xmlParser.updateProducts(productName, scannedProductCode, productsXml2);
+                                    productsXml2.close();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
                                 updateUI();
                             }
                         })
@@ -172,21 +181,24 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
+    /**
+     * Metoda służy do aktualizacji inteferjsu aplikacji. Wywoływana jest po każdej akcji na liście przedmiotów
+     */
     private void updateUI() {
-        ArrayList<String> productsList = new ArrayList<>();
+        ArrayList<Product> productsList = new ArrayList<>();
         SQLiteDatabase sqLiteDatabase = productDatabaseHelper.getReadableDatabase();
-        Cursor cursor = sqLiteDatabase.query(ProductContract.ProductEntry.TABLE,
-                new String[]{ProductContract.ProductEntry._ID, ProductContract.ProductEntry.COL_PRODUCT_NAME},
+        Cursor cursor = sqLiteDatabase.query(ProductDatabaseStructure.ProductEntry.TABLE,
+                new String[]{ProductDatabaseStructure.ProductEntry._ID, ProductDatabaseStructure.ProductEntry.PRODUCT_NAME, ProductDatabaseStructure.ProductEntry.PRODUCT_CHECKED},
                 null, null, null, null, null);
 
         while (cursor.moveToNext()) {
-            int columnIndex = cursor.getColumnIndex(ProductContract.ProductEntry.COL_PRODUCT_NAME);
-            productsList.add(cursor.getString(columnIndex));
+            int columnIndex = cursor.getColumnIndex(ProductDatabaseStructure.ProductEntry.PRODUCT_NAME);
+            int checkedIndex = cursor.getColumnIndex(ProductDatabaseStructure.ProductEntry.PRODUCT_CHECKED);
+            productsList.add(new Product(cursor.getString(columnIndex), "1", cursor.getInt(checkedIndex) > 0));
         }
 
         if (adapter == null) {
-            adapter = new ArrayAdapter<>(this, R.layout.shopping_list, R.id.product_name, productsList);
+            adapter = new ProductAdapter(this, productsList);
             productListView.setAdapter(adapter);
         } else {
             adapter.clear();
@@ -198,14 +210,41 @@ public class MainActivity extends AppCompatActivity {
         sqLiteDatabase.close();
     }
 
+    /**
+     * Metoda służy do usuwania przedmiotu z listy i bazy
+     *
+     * @param view - widok
+     */
     public void deleteProduct(View view) {
         View parent = (View) view.getParent();
         TextView productTextView = parent.findViewById(R.id.product_name);
         String product = String.valueOf(productTextView.getText());
         SQLiteDatabase sqLiteDatabase = productDatabaseHelper.getWritableDatabase();
-        sqLiteDatabase.delete(ProductContract.ProductEntry.TABLE, ProductContract.ProductEntry.COL_PRODUCT_NAME + " = ?", new String[]{product});
+        sqLiteDatabase.delete(ProductDatabaseStructure.ProductEntry.TABLE, ProductDatabaseStructure.ProductEntry.PRODUCT_NAME + " = ?", new String[]{product});
         sqLiteDatabase.close();
 
         updateUI();
+    }
+
+    /**
+     * Metoda służy do zaktualizowania kolumny checked w bazie w zależności od wartości checkbox'a
+     *
+     * @param view - widok
+     */
+    public void setProductChecked(View view) {
+        View parent = (View) view.getParent();
+        TextView productTextView = parent.findViewById(R.id.product_name);
+        CheckBox checkBox = parent.findViewById(R.id.check_box);
+        SQLiteDatabase sqLiteDatabase = productDatabaseHelper.getReadableDatabase();
+        String product = String.valueOf(productTextView.getText());
+        ContentValues contentValues = new ContentValues();
+
+        if (checkBox.isChecked()) {
+            contentValues.put(ProductDatabaseStructure.ProductEntry.PRODUCT_CHECKED, true);
+            sqLiteDatabase.update(ProductDatabaseStructure.ProductEntry.TABLE, contentValues, ProductDatabaseStructure.ProductEntry.PRODUCT_NAME + " = ?", new String[]{product});
+        } else if (!checkBox.isChecked()) {
+            contentValues.put(ProductDatabaseStructure.ProductEntry.PRODUCT_CHECKED, false);
+            sqLiteDatabase.update(ProductDatabaseStructure.ProductEntry.TABLE, contentValues, ProductDatabaseStructure.ProductEntry.PRODUCT_NAME + " = ?", new String[]{product});
+        }
     }
 }
