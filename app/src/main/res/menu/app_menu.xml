@@ -5,14 +5,20 @@
     android:layout_height="match_parent">
 
     <item
+        android:id="@+id/delete_all"
+        android:icon="@drawable/icons8_waste_filled_50"
+        android:title="@string/clear_all"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/action_open_scanner"
-        android:icon="@android:drawable/ic_menu_camera"
+        android:icon="@drawable/icons8_barcode_scanner_filled_50"
         android:title="@string/open_scanner"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_add_product"
-        android:icon="@android:drawable/ic_menu_add"
+        android:icon="@drawable/icons8_plus_filled_50"
         android:title="@string/add_product"
         app:showAsAction="always" />
 
