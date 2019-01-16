@@ -15,7 +15,7 @@ import mka.item_helper_mobile.R;
 import mka.item_helper_mobile.database.Product;
 
 /**
- * Klasa rozszerzająca klasę ArrayAdapter. Pomaga pamiętać stan checkboxa przedmiotu.
+ * Klasa rozszerzająca klasę ArrayAdapter. Pomaga pamiętać stan checkbox'a przedmiotu.
  */
 public class ProductAdapter extends ArrayAdapter<Product> {
 

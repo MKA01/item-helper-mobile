@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Lista zakupów</string>
+    <string name="hello">Witaj</string>
+    <string name="delete">Usuń</string>
+    <string name="open_scanner">Otwórz skaner</string>
+    <string name="add_product">Dodaj produkt</string>
+    <string name="scan">Skanuj</string>
+    <string name="add">Dodaj</string>
+    <string name="cancel">Anuluj</string>
+    <string name="what_to_buy">Co chcesz kupić?</string>
+    <string name="clear">Wyczyść</string>
+    <string name="clear_all">Wyczyść wszystkie</string>
+    <string name="screenshot">Zrzut ekranu</string>
+    <string name="add_barcode_product">Dodaj produkt i zapisz kod kreskowy</string>
+    <string name="what_is_the_name">Jak nazywa się produkt?</string>
+    <string name="no_scan_data">"Brak odpowiedzi od skanera"</string>
+    <string name="error">Błąd</string>
+    <string name="duplicate">Przedmiot jest już na liście</string>
+</resources>

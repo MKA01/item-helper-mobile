@@ -1,12 +1,19 @@
 <resources>
     <string name="app_name">Shopping list</string>
-    <string name="hello">Witaj</string>
-    <string name="delete">Usuń</string>
-    <string name="open_scanner">Otwórz skaner</string>
-    <string name="add_product">Dodaj produkt</string>
-    <string name="scan">Skanuj</string>
-    <string name="add">Dodaj</string>
-    <string name="cancel">Anuluj</string>
+    <string name="hello">Hello</string>
+    <string name="delete">Delete</string>
+    <string name="open_scanner">Open scanner</string>
+    <string name="add_product">Add product</string>
+    <string name="scan">Scan</string>
+    <string name="add">Add</string>
+    <string name="cancel">Cancel</string>
     <string name="what_to_buy">What do you want to buy?</string>
-    <string name="clean">Wyczyść</string>
+    <string name="clear">Clear</string>
+    <string name="clear_all">Clear all</string>
+    <string name="screenshot">Screenshot</string>
+    <string name="add_barcode_product">Add product and save barcode</string>
+    <string name="what_is_the_name">What is the product name?</string>
+    <string name="no_scan_data">"No scan data received"</string>
+    <string name="error">Error</string>
+    <string name="duplicate">Product is already on list</string>
 </resources>
