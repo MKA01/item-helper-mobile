@@ -261,6 +261,9 @@ public class MainActivity extends AppCompatActivity {
         refreshProductList();
     }
 
+    /**
+     * Metoda służy do usunięcia wszystkich zaznaczonych przedmiotów
+     */
     public void deleteAllCheckedProducts() {
         SQLiteDatabase sqLiteDatabase = databaseHelper.getWritableDatabase();
 
