@@ -90,13 +90,16 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_add_product:
                 addNewProduct("button", null);
+                refreshProductList();
                 return true;
             case R.id.action_open_scanner:
                 IntentIntegrator scanIntegrator = new IntentIntegrator(this);
                 scanIntegrator.initiateScan();
+                refreshProductList();
                 return true;
             case R.id.delete_all:
                 deleteAllCheckedProducts();
+                refreshProductList();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
